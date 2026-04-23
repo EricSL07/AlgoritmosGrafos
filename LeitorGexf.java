@@ -5,6 +5,10 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class LeitorGexf {
     public static void main(String[] args) {
@@ -22,26 +26,35 @@ public class LeitorGexf {
             
             // Extratir os nós
             NodeList listaNos = doc.getElementsByTagName("node");
-            System.out.println("Total de Nos encontrados: " + listaNos.getLength());
+            int n = listaNos.getLength();
+            System.out.println("Total de Nos encontrados: " + n);
             
-            for (int i = 0; i < listaNos.getLength(); i++) {
-                Node no = listaNos.item(i);
-                if (no.getNodeType() == Node.ELEMENT_NODE) {
-                    Element elemento = (Element) no;
-                    String id = elemento.getAttribute("id");
-                    String label = elemento.getAttribute("label");
+            // Criar o grafo
+            Graph grafo = new Graph(n);
+            Map<String, Integer> idToIndex = new HashMap<>();
+            List<String> labelsByIndex = new ArrayList<>(n);
 
-                    System.out.println("Nó -> ID " + id + " | Label: " + label);
-                }
+
+            for (int i = 0; i < n; i++) {
+                Node no = listaNos.item(i);
+                Element elemento = (Element) no;
+                String id = elemento.getAttribute("id");
+                String label = elemento.getAttribute("label");
+
+                idToIndex.put(id, i);
+                labelsByIndex.add(label == null || label.isBlank() ? id : label);
+                
+                System.out.println("Nó -> ID " + id + " | Label: " + label);
             }
 
             System.out.println("-----------------------------");
 
             // Extrair as Arestas
             NodeList ListaArestas = doc.getElementsByTagName("edge");
-            System.out.println("Total de Arestas encontradas " + ListaArestas.getLength());
+            int m = ListaArestas.getLength();
+            System.out.println("Total de Arestas encontradas " + m);
 
-            for (int i = 0; i < ListaArestas.getLength(); i++) {
+            for (int i = 0; i < m; i++) {
                 Node aresta = ListaArestas.item(i);
                 if (aresta.getNodeType() == Node.ELEMENT_NODE) {
                     Element elemento = (Element) aresta;
