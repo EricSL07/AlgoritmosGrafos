@@ -1,0 +1,1 @@
+public record Vertex(String id, String label) {}

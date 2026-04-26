@@ -1,57 +1,52 @@
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-/**
- * Undirected graph with adjacency lists, following the style from
- * Sedgewick & Wayne (Algorithms, 4th ed.).
- */
 public class Graph {
-    private final int vertices;
-    private int edges;
-    private final List<List<Integer>> adj;
+    private final Map<String, Vertex> vertices = new HashMap<>();
+    
+    private final Map<Vertex, List<Vertex>> adjacencyList = new HashMap<>();
 
-    public Graph(int vertices) {
-        if (vertices < 0) {
-            throw new IllegalArgumentException("Numero de vertices não deve ser negativo");
+    public void addVertex(String id, String label) {
+        Vertex v = new Vertex(id, label);
+
+        vertices.put(id, v);
+
+        adjacencyList.computeIfAbsent(v, k -> new ArrayList<>());
+    }
+
+    // 2. Implemente este método
+    public void addEdge(String sourceId, String targetId) {
+        Vertex source = vertices.get(sourceId);
+        Vertex target = vertices.get(targetId);
+
+        if (source == null || target == null) {
+            throw new IllegalArgumentException("Vértice não encontrada");
         }
-        this.vertices = vertices;
-        this.edges = 0;
-        this.adj = new ArrayList<>(vertices);
-        for (int v = 0; v < vertices; v++) {
-            adj.add(new ArrayList<>());
-        }
+
+        adjacencyList.get(source).add(target);
+        adjacencyList.get(target).add(source);
+
+        // Pegue o Vértice source e o target do mapa 'vertices'.
+        // Como o grafo é NÃO DIRIGIDO, adicione o target na lista do source, 
+        // e adicione o source na lista do target.
     }
 
-    public int V() {
-        return vertices;
+    // Métodos utilitários já prontos para as próximas fases
+    public Vertex getVertex(String id) {
+        return vertices.get(id);
     }
 
-    public int E() {
-        return edges;
+    public List<Vertex> getVertices() {
+        return new ArrayList<>(vertices.values());
     }
 
-    public void addEdge(int v, int w) {
-        validateVertex(v);
-        validateVertex(w);
-        adj.get(v).add(w);
-        adj.get(w).add(v);
-        edges++;
+    public List<Vertex> getNeighbors(Vertex v) {
+        return adjacencyList.getOrDefault(v, new ArrayList<>());
     }
-
-    public Iterable<Integer> adj(int v) {
-        validateVertex(v);
-        return Collections.unmodifiableList(adj.get(v));
-    }
-
-    public int degree(int v) {
-        validateVertex(v);
-        return adj.get(v).size();
-    }
-
-    private void validateVertex(int v) {
-        if (v < 0 || v >= vertices) {
-            throw new IllegalArgumentException("vertex " + v + " is not between 0 and " + (vertices - 1));
-        }
+    
+    public int getVertexCount() {
+        return vertices.size();
     }
 }
